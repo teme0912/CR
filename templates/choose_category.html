@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Choose Registration Category</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <div class="overlay"></div>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">Little Customer Registration</div>
+            <div class="topbar-actions">
+                <a class="back-link" href="#" onclick="history.go(-1); return false;">Back</a>
+            </div>
+        </div>
+    </header>
+    <main class="container center-stack">
+        <section class="card chooser-card">
+            <h1>Please choose the registration category to continue.</h1>
+            <p>Select one option to continue.</p>
+            <div class="mode-buttons two-col">
+                <a class="mode-link individual-link" href="{{ url_for('register_individual') }}">Individual</a>
+                <a class="mode-link non-individual-link" href="{{ url_for('register_non_individual') }}">Non-Individual</a>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        const navEntries = performance.getEntriesByType("navigation");
+        if (navEntries.length > 0 && navEntries[0].type === "reload") {
+            window.location.replace("{{ url_for('home') }}");
+        }
+    </script>
+</body>
+</html>

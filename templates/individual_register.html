@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Individual Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="individual-page">
+    <div class="overlay"></div>
+    <main class="container">
+        <header class="hero">
+            <h1>Individual Customer Registration</h1>
+        </header>
+
+        {% if errors %}
+        <section class="card error-box">
+            <h2>Why Registration Failed</h2>
+            <ul>
+                {% for e in errors %}
+                <li>{{ e }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        <section class="card individual-panel form-card">
+            <form action="{{ url_for('register_individual') }}" method="post">
+                <label>Type</label>
+                <select name="client_type" required>
+                    <option {% if form_data.get('client_type', 'Individual Client') == 'Individual Client' %}selected{% endif %}>Individual Client</option>
+                    <option {% if form_data.get('client_type') == 'Minors' %}selected{% endif %}>Minors</option>
+                    <option {% if form_data.get('client_type') == 'Staffs' %}selected{% endif %}>Staffs</option>
+                </select>
+
+                <div class="split-two">
+                    <div>
+                        <label>First Name</label>
+                        <input type="text" name="first_name" value="{{ form_data.get('first_name', '') }}" required />
+                    </div>
+                    <div>
+                        <label>Last Name</label>
+                        <input type="text" name="last_name" value="{{ form_data.get('last_name', '') }}" required />
+                    </div>
+                </div>
+
+                <label>Gender</label>
+                <select name="gender" required>
+                    <option value="">Select Gender</option>
+                    <option {% if form_data.get('gender') == 'Male' %}selected{% endif %}>Male</option>
+                    <option {% if form_data.get('gender') == 'Female' %}selected{% endif %}>Female</option>
+                    <option {% if form_data.get('gender') == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+
+                <label>Date of Birth</label>
+                <input type="date" name="date_of_birth" value="{{ form_data.get('date_of_birth', '') }}" required />
+
+                <label>Phone</label>
+                <input type="text" name="phone" value="{{ form_data.get('phone', '') }}" required />
+
+                <label>Email</label>
+                <input type="email" name="email" value="{{ form_data.get('email', '') }}" />
+
+                <label>Address</label>
+                <textarea name="address">{{ form_data.get('address', '') }}</textarea>
+
+                <h3>KYC</h3>
+                <label>ID Type</label>
+                <select name="id_type" required>
+                    <option value="">Select ID Type</option>
+                    <option {% if form_data.get('id_type') == 'National ID' %}selected{% endif %}>National ID</option>
+                    <option {% if form_data.get('id_type') == 'Passport' %}selected{% endif %}>Passport</option>
+                    <option {% if form_data.get('id_type') == 'Driver License' %}selected{% endif %}>Driver License</option>
+                </select>
+
+                <label>ID Number</label>
+                <input type="text" name="id_number" value="{{ form_data.get('id_number', '') }}" required />
+
+                <label>Occupation</label>
+                <input type="text" name="occupation" value="{{ form_data.get('occupation', '') }}" />
+
+                <label>Source of Funds</label>
+                <input type="text" name="source_of_funds" value="{{ form_data.get('source_of_funds', '') }}" />
+
+                <label>Risk Level (Important)</label>
+                <select name="risk_level" required>
+                    <option {% if form_data.get('risk_level', 'Medium') == 'Low' %}selected{% endif %}>Low</option>
+                    <option {% if form_data.get('risk_level', 'Medium') == 'Medium' %}selected{% endif %}>Medium</option>
+                    <option {% if form_data.get('risk_level') == 'High' %}selected{% endif %}>High</option>
+                </select>
+
+                <label class="check-label">
+                    <input type="checkbox" name="consent" value="yes" {% if form_data.get('consent') == 'yes' %}checked{% endif %} />
+                    I confirm KYC details are true.
+                </label>
+
+                <div class="action-row">
+                    <button type="submit">Submit Registration</button>
+                    <button type="button" class="soft-btn" onclick="history.go(-1)">Back</button>
+                    <button type="button" class="soft-btn" onclick="location.href='{{ url_for('home') }}'">Home</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        const navEntries = performance.getEntriesByType("navigation");
+        if (navEntries.length > 0 && navEntries[0].type === "reload") {
+            window.location.replace("{{ url_for('home') }}");
+        }
+    </script>
+</body>
+</html>

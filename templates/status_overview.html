@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Status Overview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="admin-page">
+    <div class="overlay"></div>
+
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">Status Overview</div>
+            <div class="topbar-actions">
+                <a class="admin-link" href="{{ url_for('home') }}">Home</a>
+                <a class="back-link" href="#" onclick="history.go(-1); return false;">Back</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container admin-shell">
+        <section class="card admin-hero">
+            <h1>Customer Registration Status Board</h1>
+            <p class="admin-subtitle">Real-time operational view of the current registration pipeline and approval lifecycle.</p>
+
+            <div class="summary-grid status-grid-full">
+                <div class="summary-card total-card"><span>Total Customers</span><strong>{{ summary.total }}</strong></div>
+                <div class="summary-card pending-card"><span>Pending Approval</span><strong>{{ summary.pending }}</strong></div>
+                <div class="summary-card approved-card"><span>Approved</span><strong>{{ summary.approved }}</strong></div>
+                <div class="summary-card rejected-card"><span>Rejected</span><strong>{{ summary.rejected }}</strong></div>
+                <div class="summary-card blocked-card"><span>Blocked</span><strong>{{ summary.blocked }}</strong></div>
+            </div>
+        </section>
+
+        <section class="card status-guidance">
+            <h2>Status Interpretation</h2>
+            <p>Pending Approval indicates active review queue and checker workload.</p>
+            <p>Approved indicates successfully validated customers ready for servicing.</p>
+            <p>Rejected indicates records requiring correction and controlled re-submission.</p>
+            <p>Blocked indicates restricted records under risk, policy, or regulatory controls.</p>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        const navEntries = performance.getEntriesByType("navigation");
+        if (navEntries.length > 0 && navEntries[0].type === "reload") {
+            window.location.replace("{{ url_for('home') }}");
+        }
+    </script>
+</body>
+</html>

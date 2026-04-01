@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Core Banking Client Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <div class="overlay"></div>
+    <main class="container">
+        <header class="hero">
+            <h1>Customer Registration</h1>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <section class="alerts">
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </section>
+        {% endif %}
+        {% endwith %}
+
+        <section class="mode-switch card">
+            <h2>Choose Registration Category</h2>
+            <div class="mode-buttons">
+                <button type="button" class="mode-btn" onclick="showForm('individual')">Individual</button>
+                <button type="button" class="mode-btn" onclick="showForm('non_individual')">Non-Individual</button>
+            </div>
+        </section>
+
+        <section class="forms-grid single-form-layout">
+            <article id="non_individual_form" class="card non-individual-panel hidden-form">
+                <h2>Non-Individual Registration</h2>
+                <form action="{{ url_for('register_non_individual') }}" method="post">
+                    <label>Type</label>
+                    <select name="client_type" required>
+                        <option>Corporate</option>
+                        <option>Association</option>
+                        <option>Bank</option>
+                        <option>NGOs</option>
+                    </select>
+
+                    <label>Organization Name</label>
+                    <input type="text" name="organization_name" required />
+
+                    <label>Registration Number</label>
+                    <input type="text" name="registration_number" required />
+
+                    <label>Contact Person</label>
+                    <input type="text" name="contact_person" required />
+
+                    <label>Industry</label>
+                    <input type="text" name="industry" />
+
+                    <label>Phone</label>
+                    <input type="text" name="phone" required />
+
+                    <label>Email</label>
+                    <input type="email" name="email" />
+
+                    <label>Address</label>
+                    <textarea name="address"></textarea>
+
+                    <h3>KYC</h3>
+                    <label>Tax ID</label>
+                    <input type="text" name="tax_id" required />
+
+                    <label>Certificate of Incorporation</label>
+                    <input type="text" name="certificate_of_incorporation" />
+
+                    <label>Business License Number</label>
+                    <input type="text" name="business_license_number" />
+
+                    <label>Beneficial Owner</label>
+                    <input type="text" name="beneficial_owner" />
+
+                    <button type="submit">Register Non-Individual</button>
+                </form>
+            </article>
+
+            <article id="individual_form" class="card individual-panel hidden-form">
+                <h2>Individual Registration</h2>
+                <form action="{{ url_for('register_individual') }}" method="post">
+                    <label>Type</label>
+                    <select id="individual_client_type" name="client_type" required>
+                        <option>Individual Client</option>
+                        <option>Minors</option>
+                        <option>Staffs</option>
+                    </select>
+
+                    <div class="split-two">
+                        <div>
+                            <label>First Name</label>
+                            <input type="text" name="first_name" required />
+                        </div>
+                        <div>
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" required />
+                        </div>
+                    </div>
+
+                    <label>Gender</label>
+                    <select name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+
+                    <label>Date of Birth</label>
+                    <input type="date" name="date_of_birth" required />
+
+                    <label>Phone</label>
+                    <input type="text" name="phone" required />
+
+                    <label>Email</label>
+                    <input type="email" name="email" />
+
+                    <label>Address</label>
+                    <textarea name="address"></textarea>
+
+                    <h3>KYC</h3>
+                    <label>ID Type</label>
+                    <select name="id_type" required>
+                        <option value="">Select ID Type</option>
+                        <option>National ID</option>
+                        <option>Passport</option>
+                        <option>Driver License</option>
+                    </select>
+
+                    <label>ID Number</label>
+                    <input type="text" name="id_number" required />
+
+                    <label>Occupation</label>
+                    <input type="text" name="occupation" />
+
+                    <label>Source of Funds</label>
+                    <input type="text" name="source_of_funds" />
+
+                    <button type="submit">Register Individual</button>
+                </form>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Comment Registration (Both Categories)</h2>
+            <form action="{{ url_for('add_comment') }}" method="post" class="comment-form">
+                <label>Choose Client</label>
+                <select name="client_id" required>
+                    <option value="">Select Account</option>
+                    {% for c in clients_for_comment %}
+                    <option value="{{ c.client_id }}">
+                        {{ c.account_number }} | {{ c.category }} | {{ c.client_type }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <label>Commented By</label>
+                <input type="text" name="commented_by" placeholder="Officer Name" required />
+
+                <label>Comment</label>
+                <textarea name="comment_text" required></textarea>
+
+                <button type="submit">Save Comment</button>
+            </form>
+        </section>
+
+        <section class="tables-grid">
+            <article class="card">
+                <h2>Registered Non-Individuals</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Account #</th>
+                                <th>Type</th>
+                                <th>Organization</th>
+                                <th>Contact</th>
+                                <th>Phone</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for n in non_individuals %}
+                            <tr>
+                                <td>{{ n.account_number }}</td>
+                                <td>{{ n.client_type }}</td>
+                                <td>{{ n.organization_name }}</td>
+                                <td>{{ n.contact_person }}</td>
+                                <td>{{ n.phone }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="card">
+                <h2>Registered Individuals</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Account #</th>
+                                <th>Type</th>
+                                <th>Full Name</th>
+                                <th>Gender</th>
+                                <th>Age</th>
+                                <th>Phone</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in individuals %}
+                            <tr>
+                                <td>{{ i.account_number }}</td>
+                                <td>{{ i.client_type }}</td>
+                                <td>{{ i.first_name }} {{ i.last_name }}</td>
+                                <td>{{ i.gender }}</td>
+                                <td>{{ i.age }}</td>
+                                <td>{{ i.phone }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Comments History</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Comment ID</th>
+                            <th>Account #</th>
+                            <th>Category</th>
+                            <th>Comment</th>
+                            <th>By</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in comments %}
+                        <tr>
+                            <td>{{ c.comment_id }}</td>
+                            <td>{{ c.account_number }}</td>
+                            <td>{{ c.category }}</td>
+                            <td>{{ c.comment_text }}</td>
+                            <td>{{ c.commented_by }}</td>
+                            <td>{{ c.created_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function showForm(formName, individualType) {
+            const individualForm = document.getElementById("individual_form");
+            const nonIndividualForm = document.getElementById("non_individual_form");
+            const individualTypeSelect = document.getElementById("individual_client_type");
+
+            individualForm.classList.add("hidden-form");
+            nonIndividualForm.classList.add("hidden-form");
+
+            if (formName === "individual") {
+                individualForm.classList.remove("hidden-form");
+                if (individualType) {
+                    individualTypeSelect.value = individualType;
+                }
+            }
+
+            if (formName === "non_individual") {
+                nonIndividualForm.classList.remove("hidden-form");
+            }
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

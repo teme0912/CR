@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logged Out</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <div class="overlay"></div>
+    <main class="container center-stack">
+        <section class="card chooser-card">
+            <h1>You Have Logged Out</h1>
+            <p>Your session has ended safely.</p>
+            <div class="mode-buttons two-col">
+                <a class="mode-link" href="{{ url_for('home') }}">Go To Home</a>
+                <a class="mode-link" href="{{ url_for('register_individual') }}">Start Registration</a>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

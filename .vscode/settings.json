@@ -1,0 +1,21 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "MySQL Localhost",
+            "database": "CR",
+            "username": "root",
+            "password": "Ety0912@#$",
+            "connectionTimeout": 30
+        }
+    ]
+}

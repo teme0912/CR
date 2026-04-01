@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Check Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <div class="overlay"></div>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">Registration Status Check</div>
+            <div class="topbar-actions">
+                <a class="admin-link" href="{{ url_for('home') }}">Home</a>
+                <a class="back-link" href="#" onclick="history.go(-1); return false;">Back</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="card form-card">
+            <h1>Check If You Registered</h1>
+            <p>Enter your full name and phone number to see your registration status.</p>
+
+            <form method="post" action="{{ url_for('check_registration') }}">
+                <label>Full Name</label>
+                <input type="text" name="full_name" value="{{ full_name_value }}" placeholder="Enter full name" required />
+
+                <label>Phone Number</label>
+                <input type="text" name="phone" value="{{ phone_value }}" placeholder="Enter phone number" required />
+                <button type="submit">Check Status</button>
+            </form>
+
+            {% if error_message %}
+            <div class="alert error" style="margin-top: 12px;">{{ error_message }}</div>
+            {% endif %}
+
+            {% if status_data %}
+            <div class="alert success" style="margin-top: 12px;">{{ decision_message }}</div>
+            <div class="status-grid" style="margin-top: 14px;">
+                <div><strong>Client ID:</strong> {{ status_data.account_number }}</div>
+                <div><strong>Category:</strong> {{ status_data.category }}</div>
+                <div><strong>Type:</strong> {{ status_data.client_type }}</div>
+                <div><strong>Risk Level:</strong> {{ status_data.risk_level }}</div>
+                <div><strong>Status:</strong> {{ status_data.status }}</div>
+                <div><strong>Approved By:</strong> {{ status_data.approved_by or 'Not yet approved' }}</div>
+                <div><strong>Approved At:</strong> {{ status_data.approved_at or 'Not yet approved' }}</div>
+                <div><strong>Created At:</strong> {{ status_data.created_at }}</div>
+                <div><strong>Customer Name:</strong> {{ status_data.first_name }} {{ status_data.last_name }}</div>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        const navEntries = performance.getEntriesByType("navigation");
+        if (navEntries.length > 0 && navEntries[0].type === "reload") {
+            window.location.replace("{{ url_for('home') }}");
+        }
+    </script>
+</body>
+</html>

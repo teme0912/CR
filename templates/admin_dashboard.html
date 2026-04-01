@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="admin-page">
+    <div class="overlay"></div>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">Admin Panel</div>
+            <div class="topbar-actions">
+                <a class="admin-link" href="{{ url_for('home') }}">Home</a>
+                <a class="back-link" href="#" onclick="history.go(-1); return false;">Back</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container admin-shell">
+        <section class="card admin-hero">
+            <h1>Admin Page</h1>
+            <p class="admin-subtitle">Customer Status Command Center for Real-Time Monitoring, Risk-Based Decisions, and Controlled Lifecycle Operations</p>
+            <div class="summary-grid">
+                <div class="summary-card total-card"><span>Total Customers</span><strong>{{ summary.total }}</strong></div>
+                <div class="summary-card pending-card"><span>Pending Review</span><strong>{{ summary.pending }}</strong></div>
+                <div class="summary-card approved-card"><span>Approved</span><strong>{{ summary.approved }}</strong></div>
+                <div class="summary-card rejected-card"><span>Rejected</span><strong>{{ summary.rejected }}</strong></div>
+                <div class="summary-card blocked-card"><span>Blocked</span><strong>{{ summary.blocked }}</strong></div>
+            </div>
+            <div class="status-guidance">
+                <h2>Status Control Standards</h2>
+                <p>Pending Approval: Record is queued for compliance and operational review before activation.</p>
+                <p>Approved: Record has passed review controls and is authorized for active service processing.</p>
+                <p>Rejected: Record failed validation or compliance checks and requires corrected re-submission.</p>
+                <p>Blocked: Record is restricted due to risk, policy alerts, or regulatory controls.</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Search and Filter (Important for Admin)</h2>
+            <form class="admin-filter-form" method="get" action="{{ url_for('admin_dashboard') }}">
+                <input type="text" name="q" placeholder="Search by account or name" value="{{ search_query }}" />
+                <select name="status">
+                    <option value="" {% if status_filter == '' %}selected{% endif %}>All Status</option>
+                    <option value="Pending Approval" {% if status_filter == 'Pending Approval' %}selected{% endif %}>Pending Approval</option>
+                    <option value="Approved" {% if status_filter == 'Approved' %}selected{% endif %}>Approved</option>
+                    <option value="Rejected" {% if status_filter == 'Rejected' %}selected{% endif %}>Rejected</option>
+                    <option value="Blocked" {% if status_filter == 'Blocked' %}selected{% endif %}>Blocked</option>
+                </select>
+                <button type="submit">Apply</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>All Registered Customers</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client ID</th>
+                            <th>Account</th>
+                            <th>Name / Organization</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Risk</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Manage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in clients %}
+                        <tr>
+                            <td>{{ c.client_id }}</td>
+                            <td>{{ c.account_number }}</td>
+                            <td>{{ c.display_name }}</td>
+                            <td>{{ c.category }}</td>
+                            <td>{{ c.client_type }}</td>
+                            <td>{{ c.risk_level }}</td>
+                            <td>
+                                {% if c.status == 'Approved' %}
+                                    <span class="status-pill approved-pill">{{ c.status }}</span>
+                                {% elif c.status == 'Pending Approval' %}
+                                    <span class="status-pill pending-pill">{{ c.status }}</span>
+                                {% elif c.status == 'Rejected' %}
+                                    <span class="status-pill rejected-pill">{{ c.status }}</span>
+                                {% else %}
+                                    <span class="status-pill blocked-pill">{{ c.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ c.created_at }}</td>
+                            <td>
+                                <form method="post" action="{{ url_for('admin_update_client_status', client_id=c.client_id) }}" class="inline-form">
+                                    <select name="new_status" required>
+                                        <option value="Pending Approval" {% if c.status == 'Pending Approval' %}selected{% endif %}>Pending</option>
+                                        <option value="Approved" {% if c.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                        <option value="Rejected" {% if c.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                                        <option value="Blocked" {% if c.status == 'Blocked' %}selected{% endif %}>Blocked</option>
+                                    </select>
+                                    <button type="submit">Update</button>
+                                </form>
+                                <form method="post" action="{{ url_for('admin_delete_client', client_id=c.client_id) }}" class="inline-form">
+                                    <button type="submit" class="delete-btn" onclick="return confirm('Delete this client permanently?');">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if clients|length == 0 %}
+                        <tr>
+                            <td colspan="9">No customer records found for the selected filter.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        // If this page is opened via browser refresh, send user back to Home/Welcome.
+        const navEntries = performance.getEntriesByType("navigation");
+        if (navEntries.length > 0 && navEntries[0].type === "reload") {
+            window.location.replace("{{ url_for('home') }}");
+        }
+    </script>
+</body>
+</html>

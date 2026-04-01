@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome | Little Customer Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="welcome-page">
+    <div class="overlay"></div>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">Little Customer Registration</div>
+            <div class="topbar-actions">
+                <a class="admin-link" href="{{ url_for('admin_login') }}">Admin</a>
+                <form class="logout-form" action="{{ url_for('logout') }}" method="post">
+                    <button type="submit" class="logout-link-btn">Logout</button>
+                </form>
+                <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle day and night theme">Theme</button>
+            </div>
+        </div>
+    </header>
+    <main class="container center-stack">
+        <section class="card chooser-card">
+            <div class="welcome-logo-wrap">
+                <img
+                    class="welcome-logo"
+                    src="{{ url_for('static', filename='img/logo.svg') }}"
+                    alt="Little Customer Registration logo"
+                />
+            </div>
+            <h1>Welcome To Little Customer Registration Portal</h1>
+            <p>Go to the Home page to continue registration.</p>
+
+            <div class="welcome-toggle" role="tablist" aria-label="Welcome actions">
+                <button type="button" class="toggle-option active" data-target="registration-action" aria-selected="true">New Registration</button>
+                <button type="button" class="toggle-option" data-target="status-action" aria-selected="false">Check Registration</button>
+            </div>
+
+            <div class="mode-buttons single-center toggle-panels">
+                <a id="registration-action" class="mode-link toggle-panel" href="{{ url_for('choose_category') }}">Go To Registration Category</a>
+                <a id="status-action" class="mode-link status-link toggle-panel hidden-panel" href="{{ url_for('check_registration') }}">Check If You Registered</a>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        const toggleOptions = document.querySelectorAll(".toggle-option");
+        const togglePanels = document.querySelectorAll(".toggle-panel");
+
+        toggleOptions.forEach((option) => {
+            option.addEventListener("click", () => {
+                const targetId = option.getAttribute("data-target");
+
+                toggleOptions.forEach((item) => {
+                    item.classList.remove("active");
+                    item.setAttribute("aria-selected", "false");
+                });
+
+                option.classList.add("active");
+                option.setAttribute("aria-selected", "true");
+
+                togglePanels.forEach((panel) => {
+                    panel.classList.add("hidden-panel");
+                });
+
+                const selectedPanel = document.getElementById(targetId);
+                if (selectedPanel) {
+                    selectedPanel.classList.remove("hidden-panel");
+                }
+            });
+        });
+
+        const themeToggleBtn = document.getElementById("themeToggleBtn");
+        function refreshToggleLabel() {
+            if (!themeToggleBtn) {
+                return;
+            }
+            const isDay = document.body.classList.contains("theme-day");
+            themeToggleBtn.textContent = isDay ? "Day" : "Night";
+        }
+
+        refreshToggleLabel();
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener("click", function () {
+                const nextTheme = document.body.classList.contains("theme-night") ? "day" : "night";
+                window.__setPortalTheme(nextTheme);
+                refreshToggleLabel();
+            });
+        }
+
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        mediaQuery.addEventListener("change", function () {
+            if (!localStorage.getItem("portal_theme")) {
+                window.__setPortalTheme(mediaQuery.matches ? "night" : "day");
+                localStorage.removeItem("portal_theme");
+                refreshToggleLabel();
+            }
+        });
+    </script>
+</body>
+</html>

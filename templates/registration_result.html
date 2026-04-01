@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration Status</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <div class="overlay"></div>
+    <main class="container center-stack">
+        <section class="card result-card">
+            {% if status_message %}
+                <p class="status-note">{{ status_message }}</p>
+            {% endif %}
+
+            {% if success %}
+                <h1>Registration Completed</h1>
+                <p class="status-ok">Customer has been registered successfully.</p>
+            {% else %}
+                <h1>Registration Failed</h1>
+                <p class="status-bad">Please review the reasons below.</p>
+                <ul>
+                    {% for reason in reason_list %}
+                    <li>{{ reason }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if status_data %}
+            <div class="status-grid">
+                <div><strong>Client ID:</strong> {{ status_data.account_number }}</div>
+                <div><strong>Category:</strong> {{ status_data.category }}</div>
+                <div><strong>Type:</strong> {{ status_data.client_type }}</div>
+                <div><strong>Risk Level:</strong> {{ status_data.risk_level }}</div>
+                <div><strong>Status:</strong> {{ status_data.status }}</div>
+                <div><strong>Phone:</strong> {{ status_data.phone }}</div>
+                <div><strong>Approved By:</strong> {{ status_data.approved_by or 'Not yet approved' }}</div>
+                <div><strong>Approved At:</strong> {{ status_data.approved_at or 'Not yet approved' }}</div>
+                <div><strong>Created At:</strong> {{ status_data.created_at }}</div>
+                {% if status_data.category == 'Individual' %}
+                <div><strong>Customer Name:</strong> {{ status_data.first_name }} {{ status_data.last_name }}</div>
+                {% else %}
+                <div><strong>Organization:</strong> {{ status_data.organization_name }}</div>
+                {% endif %}
+            </div>
+
+            {% if status_data.status == 'Pending Approval' and session.get('admin_authenticated') %}
+            <form class="approve-form" action="{{ url_for('approve_client', client_id=status_data.client_id) }}" method="post">
+                <label>Checker Name</label>
+                <input type="text" name="checker_name" placeholder="Checker Officer" required />
+                <button type="submit">Approve Client</button>
+            </form>
+            {% endif %}
+            {% endif %}
+
+            {% set back_url = url_for('choose_category') %}
+            {% if status_data and status_data.category == 'Individual' %}
+                {% set back_url = url_for('register_individual') %}
+            {% elif status_data and status_data.category == 'Non-Individual' %}
+                {% set back_url = url_for('register_non_individual') %}
+            {% endif %}
+
+            <div class="mode-buttons two-col">
+                <button type="button" class="mode-btn" onclick="location.href='{{ back_url }}'">Back</button>
+                <button type="button" class="mode-btn" onclick="location.href='{{ url_for('home') }}'">Home</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        const navEntries = performance.getEntriesByType("navigation");
+        if (navEntries.length > 0 && navEntries[0].type === "reload") {
+            window.location.replace("{{ url_for('home') }}");
+        }
+    </script>
+</body>
+</html>

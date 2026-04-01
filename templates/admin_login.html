@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <div class="overlay"></div>
+    <main class="container center-stack">
+        <section class="card chooser-card admin-login-card">
+            <h1>Admin Login</h1>
+            <p>Enter admin username and password to manage the portal.</p>
+
+            {% if error_message %}
+            <div class="alert error">{{ error_message }}</div>
+            {% endif %}
+
+            <form method="post" action="{{ url_for('admin_login') }}" class="admin-login-form" autocomplete="off">
+                <label>Username</label>
+                <input type="text" name="username" required autocomplete="off" autocapitalize="off" spellcheck="false" />
+
+                <label>Password</label>
+                <input type="password" name="password" required autocomplete="new-password" />
+
+                <label class="check-label">
+                    <input type="checkbox" id="remember_admin_username" />
+                    Remember username on this device
+                </label>
+
+                <button type="submit">Login as Admin</button>
+            </form>
+
+            <a class="ghost-link" href="{{ url_for('welcome') }}">Back to Welcome</a>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        const usernameStorageKey = "admin_login_username";
+
+        // Do not save credentials by default; only restore username if explicitly remembered.
+        window.addEventListener("pageshow", function () {
+            const form = document.querySelector(".admin-login-form");
+            if (!form) {
+                return;
+            }
+
+            const username = form.querySelector('input[name="username"]');
+            const password = form.querySelector('input[name="password"]');
+            const remember = document.getElementById("remember_admin_username");
+
+            const savedUsername = localStorage.getItem(usernameStorageKey);
+            if (savedUsername && username) {
+                username.value = savedUsername;
+                if (remember) {
+                    remember.checked = true;
+                }
+            } else if (username) {
+                username.value = "";
+                if (remember) {
+                    remember.checked = false;
+                }
+            }
+
+            if (username) {
+                username.autocomplete = "off";
+            }
+            if (password) {
+                password.value = "";
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector(".admin-login-form");
+            if (!form) {
+                return;
+            }
+            form.addEventListener("submit", function () {
+                const username = form.querySelector('input[name="username"]');
+                const remember = document.getElementById("remember_admin_username");
+
+                if (remember && remember.checked && username) {
+                    localStorage.setItem(usernameStorageKey, username.value.trim());
+                } else {
+                    localStorage.removeItem(usernameStorageKey);
+                }
+            });
+        });
+
+        const navEntries = performance.getEntriesByType("navigation");
+        if (navEntries.length > 0 && navEntries[0].type === "reload") {
+            window.location.replace("{{ url_for('home') }}");
+        }
+    </script>
+</body>
+</html>
